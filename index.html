@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EGVD: Event-Guided Video Diffusion Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2c5282;
+            --secondary: #3182ce;
+            --light: #f7fafc;
+            --dark: #1a365d;
+            --text: #2d3748;
+            --text-light: #4a5568;
+            --spacing: 1rem;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,137 +23,296 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f7f6;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-image: linear-gradient(45deg, #8e44ad, #3498db);
-            animation: gradient-animation 10s ease infinite;
-            overflow: hidden;
-        }
-
-        @keyframes gradient-animation {
-            0% {
-                background-image: linear-gradient(45deg, #8e44ad, #3498db);
-            }
-            50% {
-                background-image: linear-gradient(45deg, #3498db, #8e44ad);
-            }
-            100% {
-                background-image: linear-gradient(45deg, #8e44ad, #3498db);
-            }
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fff;
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 16px;
+            font-weight: 400;
         }
 
         .container {
-            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 var(--spacing);
+        }
+
+        .header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
             color: white;
-            max-width: 900px;
-            padding: 20px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            margin: 0 20px;
+            padding: 4rem 0 3rem;
+            margin-bottom: 2rem;
         }
 
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            animation: slideIn 2s ease-in-out;
+        .title {
+            font-size: 2.6rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
         }
 
-        p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            animation: fadeIn 3s ease-in-out;
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            max-width: 800px;
         }
 
-        @keyframes slideIn {
-            0% {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .authors {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            gap: 0.5rem 1rem;
         }
 
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
+        .author {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .affiliation {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
         }
 
         .btn {
-            background-color: #3498db;
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.1em;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: var(--primary);
             text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 20px;
-            transition: background-color 0.3s;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn:hover {
-            background-color: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        .section {
-            margin: 40px 0;
+        .btn svg {
+            margin-right: 0.5rem;
+            height: 1.25rem;
+            width: 1.25rem;
         }
 
-        iframe {
+        section {
+            margin: 3rem 0;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .teaser-image {
             width: 100%;
-            height: 400px;
-            border-radius: 10px;
+            border-radius: 6px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .framework-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            display: block;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            margin: 2rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: none;
         }
 
-        ul {
-            text-align: left;
-            margin-left: 30px;
+        .key-points {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .key-points li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .key-points li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background: var(--secondary);
+            border-radius: 50%;
+        }
+
+        .citation {
+            background: var(--light);
+            border-radius: 6px;
+            padding: 1.5rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text);
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .authors {
+                font-size: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="container">
+            <h1 class="title">EGVD: Event-Guided Video Diffusion Model for Physically Realistic Large-Motion Frame Interpolation</h1>
+            <p class="subtitle">A novel framework leveraging event camera data with stable video diffusion models for high-quality frame interpolation in challenging scenarios</p>
+            
+            <div class="authors">
+                <span class="author">Ziran Zhang<sup>1,2</sup></span>
+                <span class="author">Xiaohui Li<sup>2,3</sup></span>
+                <span class="author">Yihao Liu<sup>2</sup></span>
+                <span class="author">Yujin Wang<sup>2</sup></span>
+                <span class="author">Yueting Chen<sup>1</sup></span>
+                <span class="author">Tianfan Xue<sup>4,2*</sup></span>
+                <span class="author">Shi Guo<sup>2*</sup></span>
+            </div>
+            
+            <div class="affiliation">
+                <sup>1</sup>Zhejiang University &nbsp;&nbsp;
+                <sup>2</sup>Shanghai AI Laboratory &nbsp;&nbsp;
+                <sup>3</sup>Shanghai Jiao Tong University &nbsp;&nbsp;
+                <sup>4</sup>The Chinese University of Hong Kong
+                <br><sup>*</sup>Corresponding authors
+            </div>
+            
+            <div class="buttons">
+                <a href="https://arxiv.org/abs/2503.20268" class="btn" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Paper
+                </a>
+                <a href="https://github.com/OpenImagingLab/EGVD" class="btn" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                    Code
+                </a>
+                <a href="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/view?usp=drive_link" class="btn" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                    Demo Video
+                </a>
+            </div>
+        </div>
+    </header>
 
     <div class="container">
-        <h1>EGVD: Event-Guided Video Diffusion Model</h1>
-        <p>Event-Guided Video Diffusion Model (EGVD) addresses the challenges of frame interpolation in large-motion scenarios by utilizing event camera data with stable video diffusion models, offering physically realistic results with high perceptual quality.</p>
+        <img src="./docs/teaser.png" alt="EGVD Teaser" class="teaser-image">
         
-        <div class="section">
+        <section>
             <h2>Abstract</h2>
-            <p>Video frame interpolation (VFI) in scenarios with large motion remains challenging due to motion ambiguity between frames. While event cameras can capture high temporal resolution motion information, existing event-based VFI methods struggle with limited training data and complex motion patterns. In this paper, we introduce Event-Guided Video Diffusion Model (EGVD), a novel framework that leverages the powerful priors of pre-trained stable video diffusion models alongside the precise temporal information from event cameras. Our approach features a Multi-modal Motion Condition Generator (MMCG) that effectively integrates RGB frames and event signals to guide the diffusion process, producing physically realistic intermediate frames.</p>
-        </div>
+            <p>Video frame interpolation (VFI) in scenarios with large motion remains challenging due to motion ambiguity between frames. While event cameras can capture high temporal resolution motion information, existing event-based VFI methods struggle with limited training data and complex motion patterns. In this paper, we introduce Event-Guided Video Diffusion Model (EGVD), a novel framework that leverages the powerful priors of pre-trained stable video diffusion models alongside the precise temporal information from event cameras. Our approach features a Multi-modal Motion Condition Generator (MMCG) that effectively integrates RGB frames and event signals to guide the diffusion process, producing physically realistic intermediate frames. We employ a selective fine-tuning strategy that preserves spatial modeling capabilities while efficiently incorporating event-guided temporal information. We incorporate input-output normalization techniques inspired by recent advances in diffusion modeling to enhance training stability across varying noise levels. To improve generalization, we construct a comprehensive dataset combining both real and simulated event data across diverse scenarios. Extensive experiments on both real and simulated datasets demonstrate that EGVD significantly outperforms existing methods in handling large motion and challenging lighting conditions, achieving substantial improvements in perceptual quality metrics (27.4% better LPIPS on Prophesee and 24.1% on BSRGB) while maintaining competitive fidelity measures.</p>
+        </section>
+        
+        <section>
+            <h2>Method</h2>
+            <img src="./docs/framework.png" alt="EGVD Framework" class="framework-image">
+        </section>
+        
+        <section>
+            <h2>Results</h2>
+            <div class="video-container">
+                <iframe src="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/preview" title="EGVD Demo Video" allowfullscreen></iframe>
+            </div>
+        </section>
 
-        <div class="section">
-            <h2>Key Advantages</h2>
-            <ul>
-                <li><strong>Event-Driven:</strong> Utilizes high temporal resolution from event cameras for accurate motion interpolation.</li>
-                <li><strong>Diffusion Priors:</strong> Leverages powerful generative priors from pre-trained video diffusion models for improved quality.</li>
-                <li><strong>Selective Fine-Tuning:</strong> Preserves spatial information while incorporating event-driven temporal data efficiently.</li>
-                <li><strong>Improved Generalization:</strong> Trained on a comprehensive dataset combining real-world and simulated data.</li>
+        <section>
+            <h2>Key Contributions</h2>
+            <ul class="key-points">
+                <li>A novel Multi-Modal Motion Condition Generator (MMCG) that integrates event information into the SVD framework to improve the interpolation of large motions.</li>
+                <li>A two-stage training strategy that first trains the conditioning generator independently, followed by fine-tuning the SVD model to adapt to Event-VFI.</li>
+                <li>A diverse and comprehensive training dataset that combines real-world and synthetic event-RGB data, improving the generalization ability of our model.</li>
+                <li>Extensive experimental results demonstrate that our approach outperforms existing methods, particularly in large-motion and low-light scenarios.</li>
             </ul>
-        </div>
+        </section>
 
-        <div class="section">
-            <h2>See It In Action</h2>
-            <a href="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/view?usp=drive_link" target="_blank" class="btn">Watch the Demo Video</a>
-        </div>
-
-        <div class="section">
-            <h2>Visual Comparison</h2>
-            <iframe src="https://www.youtube.com/embed/your_video_id" title="EGVD Demo Video"></iframe>
-        </div>
+        <section>
+            <h2>Citation</h2>
+            <div class="citation">@article{zhang2025egvd,
+  title={EGVD: Event-Guided Video Diffusion Model for Physically Realistic Large-Motion Frame Interpolation},
+  author={Zhang, Ziran and Li, Xiaohui and Liu, Yihao and Wang, Yujin and Chen, Yueting and Xue, Tianfan and Guo, Shi},
+  journal={arXiv preprint arXiv:2503.20268},
+  year={2025}
+}</div>
+        </section>
     </div>
-
 </body>
 </html>

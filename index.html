@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EGVD: Event-Guided Video Diffusion Model</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c5282;
-            --secondary: #3182ce;
-            --light: #f7fafc;
-            --dark: #1a365d;
-            --text: #2d3748;
-            --text-light: #4a5568;
-            --spacing: 1rem;
+            --primary: #3b5998;
+            --primary-light: #8b9dc3;
+            --primary-dark: #2a4374;
+            --accent: #6a89cc;
+            --background: #f9fafb;
+            --text-dark: #333f4d;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow: rgba(50, 50, 93, 0.1);
+            --spacing: 1.25rem;
         }
         
         * {
@@ -22,134 +26,191 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #fff;
-            color: var(--text);
-            line-height: 1.5;
-            font-size: 16px;
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--background);
+            color: var(--text-medium);
+            line-height: 1.65;
+            font-size: 17px;
             font-weight: 400;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 0 var(--spacing);
         }
 
         .header {
-            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
-            padding: 4rem 0 3rem;
-            margin-bottom: 2rem;
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: radial-gradient(circle at 20% 70%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .title {
-            font-size: 2.6rem;
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-size: 2.8rem;
             font-weight: 700;
             line-height: 1.2;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            font-weight: 400;
-            margin-bottom: 2rem;
+            font-size: 1.25rem;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
             opacity: 0.95;
-            max-width: 800px;
+            max-width: 820px;
+            line-height: 1.6;
         }
 
         .authors {
             display: flex;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             font-size: 1.1rem;
-            gap: 0.5rem 1rem;
+            gap: 0.6rem 1.2rem;
         }
 
         .author {
             display: inline-flex;
             align-items: center;
+            font-family: 'Source Serif Pro', Georgia, serif;
         }
 
         .affiliation {
             font-size: 0.95rem;
             opacity: 0.9;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
         }
 
         .buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 2rem;
+            gap: 1.2rem;
+            margin-top: 2.5rem;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
-            padding: 0.75rem 1.5rem;
-            background: white;
-            color: var(--primary);
+            justify-content: center;
+            padding: 0.8rem 1.6rem;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--primary-dark);
             text-decoration: none;
             border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 140px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            background: white;
         }
 
         .btn svg {
-            margin-right: 0.5rem;
-            height: 1.25rem;
-            width: 1.25rem;
+            margin-right: 0.6rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            opacity: 0.8;
         }
 
         section {
-            margin: 3rem 0;
+            margin: 4rem 0;
+            padding: 2rem 2.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px var(--shadow);
         }
 
         h2 {
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-size: 1.9rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.8rem;
             font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
         }
 
         p {
-            margin-bottom: 1.5rem;
-            color: var(--text);
-            line-height: 1.7;
+            margin-bottom: 1.8rem;
+            color: var(--text-medium);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            text-align: justify;
         }
 
         .teaser-image {
             width: 100%;
             border-radius: 6px;
-            margin: 2rem 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin: 2.5rem 0;
+            box-shadow: 0 6px 20px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .teaser-image:hover {
+            transform: scale(1.01);
         }
 
         .framework-image {
             width: 100%;
-            max-width: 800px;
-            margin: 2rem auto;
+            max-width: 850px;
+            margin: 2.5rem auto;
             display: block;
             border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 20px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .framework-image:hover {
+            transform: scale(1.01);
         }
 
         .video-container {
             position: relative;
             width: 100%;
             padding-top: 56.25%;
-            margin: 2rem 0;
-            border-radius: 6px;
+            margin: 2.5rem 0;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 20px var(--shadow);
         }
 
         .video-container iframe {
@@ -163,13 +224,15 @@
 
         .key-points {
             list-style: none;
-            margin: 1.5rem 0;
+            margin: 1.8rem 0;
         }
 
         .key-points li {
             position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
+            padding-left: 1.8rem;
+            margin-bottom: 1.3rem;
+            color: var(--text-medium);
+            line-height: 1.7;
         }
 
         .key-points li::before {
@@ -177,27 +240,61 @@
             position: absolute;
             left: 0;
             top: 0.5rem;
-            width: 0.5rem;
-            height: 0.5rem;
-            background: var(--secondary);
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
             border-radius: 50%;
+            opacity: 0.8;
         }
 
         .citation {
-            background: var(--light);
-            border-radius: 6px;
-            padding: 1.5rem;
+            background: var(--background);
+            border-radius: 8px;
+            padding: 1.8rem;
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             line-height: 1.6;
-            color: var(--text);
+            color: var(--text-dark);
             overflow-x: auto;
             white-space: pre-wrap;
+            border: 1px solid var(--border);
+        }
+
+        /* Subtle animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        section {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        section:nth-child(2) { animation-delay: 0.1s; }
+        section:nth-child(3) { animation-delay: 0.2s; }
+        section:nth-child(4) { animation-delay: 0.3s; }
+        section:nth-child(5) { animation-delay: 0.4s; }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
             .title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
             .subtitle {
@@ -212,12 +309,24 @@
             
             .buttons {
                 flex-direction: column;
-                gap: 0.75rem;
+                gap: 0.9rem;
             }
             
             .btn {
                 width: 100%;
-                justify-content: center;
+            }
+
+            section {
+                padding: 1.8rem 1.5rem;
+                margin: 2.5rem 0;
+            }
+
+            h2 {
+                font-size: 1.7rem;
+            }
+
+            p {
+                font-size: 1rem;
             }
         }
     </style>
@@ -314,5 +423,11 @@
 }</div>
         </section>
     </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 <a href="https://github.com/OpenImagingLab/EGVD" target="_blank">OpenImagingLab</a>. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>

@@ -1,416 +1,727 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EGVD: Event-Guided Video Diffusion Model</title>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4e73df;
-            --primary-light: #6cb2eb;
-            --primary-dark: #2e59d9;
-            --accent: #ff6f61;
-            --background: #f3f4f6;
-            --text-dark: #212529;
-            --text-medium: #495057;
-            --text-light: #868e96;
-            --border: #d1d3e2;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --spacing: 1.25rem;
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EGVD: Event-Guided Video Diffusion Model</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+
+--primary: #5046e5;
+
+--primary-light: #7b6ef6;
+
+--primary-dark: #3832a0;
+
+--secondary: #ff4d6d;
+
+--accent-1: #00b4d8;
+
+--accent-2: #5e60ce;
+
+--accent-3: #8338ec;
+
+--background: #f8f9ff;
+
+--card-bg: #ffffff;
+
+--text-dark: #2b2d42;
+
+--text-medium: #4a5568;
+
+--text-light: #718096;
+
+--border: #e2e8f0;
+
+--shadow: rgba(50, 50, 93, 0.1);
+
+--glow: rgba(80, 70, 229, 0.4);
+
+--spacing: 1.25rem;
+
+}
+
+css
+Copy
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--background);
+        color: var(--text-medium);
+        line-height: 1.65;
+        font-size: 17px;
+        font-weight: 400;
+        overflow-x: hidden;
+        background-image: 
+            radial-gradient(circle at 20% 30%, rgba(123, 110, 246, 0.05) 0%, transparent 25%),
+            radial-gradient(circle at 80% 70%, rgba(0, 180, 216, 0.05) 0%, transparent 25%);
+    }
+
+    .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 var(--spacing);
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--primary), var(--accent-2));
+        color: white;
+        padding: 5rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: 
+            url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.07' fill-rule='evenodd'/%3E%3C/svg%3E"),
+            radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.12) 0%, transparent 70%),
+            radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    .title {
+        font-family: 'Source Serif Pro', Georgia, serif;
+        font-size: 2.8rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.2rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        animation: fadeUp 0.8s ease-out;
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+        font-weight: 400;
+        margin-bottom: 2.5rem;
+        max-width: 820px;
+        line-height: 1.6;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        color: rgba(255, 255, 255, 0.95);
+        animation: fadeUp 0.8s ease-out 0.1s forwards;
+        opacity: 0;
+    }
+
+    .authors {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 1.2rem;
+        font-size: 1.1rem;
+        gap: 0.6rem 1.2rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        animation: fadeUp 0.8s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+
+    .author {
+        display: inline-flex;
+        align-items: center;
+        font-family: 'Source Serif Pro', Georgia, serif;
+    }
+
+    .affiliation {
+        font-size: 0.95rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        animation: fadeUp 0.8s ease-out 0.3s forwards;
+        opacity: 0;
+    }
+
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        margin-top: 2.5rem;
+        animation: fadeUp 0.8s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 1.6rem;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--primary-dark);
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 140px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, var(--accent-1), var(--accent-3));
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .btn:hover::before {
+        opacity: 1;
+    }
+
+    .btn svg {
+        margin-right: 0.6rem;
+        height: 1.2rem;
+        width: 1.2rem;
+        opacity: 0.8;
+        transition: transform 0.3s ease;
+    }
+
+    .btn:hover svg {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .main-content {
+        margin: 3rem 0;
+    }
+
+    section {
+        margin: 3rem 0;
+        padding: 2.5rem;
+        background: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: 0 6px 25px rgba(50, 50, 93, 0.08), 0 3px 10px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(230, 232, 250, 0.7);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+    }
+
+    section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+        font-family: 'Source Serif Pro', Georgia, serif;
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin-bottom: 1.8rem;
+        font-weight: 600;
+        position: relative;
+        display: inline-block;
+    }
+
+    h2::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(to right, var(--accent-1), var(--accent-3));
+        border-radius: 3px;
+    }
+
+    p {
+        margin-bottom: 1.8rem;
+        color: var(--text-dark);
+        line-height: 1.8;
+        font-size: 1.05rem;
+        text-align: justify;
+    }
+
+    .image-container {
+        margin: 2.5rem 0;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        animation: fadeUp 0.8s ease-out 0.5s forwards;
+        opacity: 0;
+    }
+
+    .teaser-image, .framework-image {
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+        transition: transform 0.5s ease;
+        display: block;
+    }
+
+    .teaser-image:hover, .framework-image:hover {
+        transform: scale(1.02);
+    }
+
+    .image-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom right, rgba(80, 70, 229, 0.15), rgba(0, 180, 216, 0.15));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+    }
+
+    .image-container:hover::after {
+        opacity: 1;
+    }
+
+    .image-caption {
+        text-align: center;
+        margin-top: 1.2rem;
+        font-size: 0.95rem;
+        color: var(--text-light);
+        font-style: italic;
+        padding: 0 1rem;
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        margin: 2.5rem 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+        transform: translateZ(0);
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .video-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        background: linear-gradient(45deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--secondary)) border-box;
+        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .key-points {
+        list-style: none;
+        margin: 1.8rem 0;
+    }
+
+    .key-points li {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-dark);
+        line-height: 1.7;
+    }
+
+    .key-points li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        top: 0.2rem;
+        font-weight: bold;
+        color: var(--accent-1);
+        font-size: 1.2rem;
+    }
+
+    .citation {
+        background: rgba(248, 249, 255, 0.8);
+        border-radius: 12px;
+        padding: 1.8rem;
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+        overflow-x: auto;
+        white-space: pre-wrap;
+        border: 1px solid rgba(226, 232, 240, 0.7);
+        box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
+        position: relative;
+    }
+
+    .citation::before {
+        content: '{ Citation }';
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        color: white;
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animation keyframes */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 var(--glow); }
+        70% { box-shadow: 0 0 0 15px rgba(80, 70, 229, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(80, 70, 229, 0); }
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Interactive reveal animations for sections */
+    .reveal {
+        animation: fadeUp 0.8s ease-out forwards;
+    }
+
+    /* Footer styling */
+    footer {
+        text-align: center;
+        padding: 3rem 0;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-top: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--primary-light), transparent);
+    }
+
+    footer a {
+        color: var(--accent-2);
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+        transition: color 0.3s;
+    }
+
+    footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(to right, var(--accent-1), var(--accent-3));
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease;
+    }
+
+    footer a:hover {
+        color: var(--primary);
+    }
+
+    footer a:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+
+    /* Event particles animation */
+    .event-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .particle {
+        position: absolute;
+        background: white;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        opacity: 0;
+        animation: particle 1.5s ease-in-out infinite;
+    }
+
+    @keyframes particle {
+        0% { opacity: 0; transform: scale(0); }
+        50% { opacity: 0.8; }
+        100% { opacity: 0; transform: scale(1.5); }
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .title {
+            font-size: 2.2rem;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--background);
-            color: var(--text-medium);
-            line-height: 1.65;
-            font-size: 17px;
-            font-weight: 400;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 0 var(--spacing);
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4e73df, #1c6cc4);
-            color: white;
-            padding: 6rem 0 4rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-        }
-
-        .header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-image: radial-gradient(circle at 20% 70%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .title {
-            font-family: 'Source Serif Pro', Georgia, serif;
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1.2rem;
-            letter-spacing: -0.02em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
         .subtitle {
-            font-size: 1.3rem;
-            font-weight: 400;
-            margin-bottom: 2.5rem;
-            max-width: 820px;
-            line-height: 1.6;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-            color: rgba(255, 255, 255, 0.95);
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .authors {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
             font-size: 1.1rem;
-            gap: 0.6rem 1.2rem;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-            justify-content: center;
         }
-
-        .author {
-            display: inline-flex;
-            align-items: center;
-            font-family: 'Source Serif Pro', Georgia, serif;
+        
+        .authors {
+            font-size: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
         }
-
-        .affiliation {
-            font-size: 0.95rem;
-            margin-bottom: 2.5rem;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-            text-align: center;
-        }
-
+        
         .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-            margin-top: 2.5rem;
-            justify-content: center;
+            flex-direction: column;
+            gap: 0.9rem;
         }
-
+        
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.8rem 1.6rem;
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--primary-dark);
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            min-width: 140px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-            background: white;
-        }
-
-        .btn svg {
-            margin-right: 0.6rem;
-            height: 1.2rem;
-            width: 1.2rem;
-            opacity: 0.8;
-        }
-
-        .main-content {
-            margin: 3rem 0;
-            text-align: center;
+            width: 100%;
         }
 
         section {
-            margin: 3rem 0;
-            padding: 2.5rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 6px 25px rgba(50, 50, 93, 0.1), 0 3px 10px rgba(0, 0, 0, 0.05);
-            text-align: left;
+            padding: 1.8rem 1.5rem;
+            margin: 2rem 0;
         }
 
         h2 {
-            font-family: 'Source Serif Pro', Georgia, serif;
-            font-size: 2rem;
-            color: var(--primary-dark);
-            margin-bottom: 1.8rem;
-            font-weight: 600;
-            position: relative;
-            display: inline-block;
-        }
-
-        h2::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 3px;
+            font-size: 1.7rem;
         }
 
         p {
-            margin-bottom: 1.8rem;
-            color: var(--text-dark);
-            line-height: 1.8;
-            font-size: 1.05rem;
-            text-align: justify;
+            font-size: 1rem;
         }
 
-        .image-container {
-            margin: 2.5rem 0;
-            position: relative;
+        .citation::before {
+            font-size: 0.75rem;
         }
-
-        .teaser-image, .framework-image {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease;
-            display: block;
-        }
-
-        .teaser-image:hover, .framework-image:hover {
-            transform: scale(1.01);
-        }
-
-        .image-caption {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.95rem;
-            color: var(--text-light);
-            font-style: italic;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%;
-            margin: 2.5rem 0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .key-points {
-            list-style: none;
-            margin: 1.8rem 0;
-        }
-
-        .key-points li {
-            position: relative;
-            padding-left: 1.8rem;
-            margin-bottom: 1.3rem;
-            color: var(--text-dark);
-            line-height: 1.7;
-        }
-
-        .key-points li::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0.5rem;
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0.8;
-        }
-
-        .citation {
-            background: var(--background);
-            border-radius: 8px;
-            padding: 1.8rem;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 0.92rem;
-            line-height: 1.6;
-            color: var(--text-dark);
-            overflow-x: auto;
-            white-space: pre-wrap;
-            border: 1px solid var(--border);
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 0;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2.2rem;
-            }
-            
-            .subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .authors {
-                font-size: 1rem;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .buttons {
-                flex-direction: column;
-                gap: 0.9rem;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-
-            section {
-                padding: 1.8rem 1.5rem;
-                margin: 2rem 0;
-            }
-
-            h2 {
-                font-size: 1.7rem;
-            }
-
-            p {
-                font-size: 1rem;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
+
 <body>
-    <header class="header">
-        <div class="container">
-            <h1 class="title">EGVD: Event-Guided Video Diffusion Model for Physically Realistic Large-Motion Frame Interpolation</h1>
-            <p class="subtitle">A novel framework leveraging event camera data with stable video diffusion models for high-quality frame interpolation in challenging scenarios</p>
-            
-            <div class="authors">
-                <span class="author">Ziran Zhang<sup>1,2</sup></span>
-                <span class="author">Xiaohui Li<sup>2,3</sup></span>
-                <span class="author">Yihao Liu<sup>2</sup></span>
-                <span class="author">Yujin Wang<sup>2</sup></span>
-                <span class="author">Yueting Chen<sup>1</sup></span>
-                <span class="author">Tianfan Xue<sup>4,2*</sup></span>
-                <span class="author">Shi Guo<sup>2*</sup></span>
-            </div>
-            
-            <div class="affiliation">
-                <sup>1</sup>Zhejiang University &nbsp;&nbsp;
-                <sup>2</sup>Shanghai AI Laboratory &nbsp;&nbsp;
-                <sup>3</sup>Shanghai Jiao Tong University &nbsp;&nbsp;
-                <sup>4</sup>The Chinese University of Hong Kong
-                <br><sup>*</sup>Corresponding authors
-            </div>
-            
-            <div class="buttons">
-                <a href="https://arxiv.org/abs/2503.20268" class="btn" target="_blank">
-                    Paper
-                </a>
-                <a href="https://github.com/OpenImagingLab/EGVD" class="btn" target="_blank">
-                    Code
-                </a>
-                <a href="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/view?usp=drive_link" class="btn" target="_blank">
-                    Demo Video
-                </a>
-            </div>
+
+<div class="event-particles" id="particles"></div>
+
+angelscript
+Copy
+<header class="header">
+    <div class="container">
+        <h1 class="title">EGVD: Event-Guided Video Diffusion Model for Physically Realistic Large-Motion Frame Interpolation</h1>
+        <p class="subtitle">A novel framework leveraging event camera data with stable video diffusion models for high-quality frame interpolation in challenging scenarios</p>
+        
+        <div class="authors">
+            <span class="author">Ziran Zhang<sup>1,2</sup></span>
+            <span class="author">Xiaohui Li<sup>2,3</sup></span>
+            <span class="author">Yihao Liu<sup>2</sup></span>
+            <span class="author">Yujin Wang<sup>2</sup></span>
+            <span class="author">Yueting Chen<sup>1</sup></span>
+            <span class="author">Tianfan Xue<sup>4,2*</sup></span>
+            <span class="author">Shi Guo<sup>2*</sup></span>
         </div>
-    </header>
-
-    <div class="container main-content">
-        <section>
-            <h2>Abstract</h2>
-            <p>Video frame interpolation (VFI) in scenarios with large motion remains challenging due to motion ambiguity between frames...</p>
-        </section>
         
-        <section>
-            <h2>Method</h2>
-            <div class="image-container">
-                <img src="./docs/framework.png" alt="EGVD Framework" class="framework-image">
-                <div class="image-caption">Overview of our Event-Guided Video Diffusion Model (EGVD) framework</div>
-            </div>
-        </section>
+        <div class="affiliation">
+            <sup>1</sup>Zhejiang University &nbsp;&nbsp;
+            <sup>2</sup>Shanghai AI Laboratory &nbsp;&nbsp;
+            <sup>3</sup>Shanghai Jiao Tong University &nbsp;&nbsp;
+            <sup>4</sup>The Chinese University of Hong Kong
+            <br><sup>*</sup>Corresponding authors
+        </div>
         
-        <section>
-            <h2>Results</h2>
-            <div class="video-container">
-                <iframe src="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/preview" title="EGVD Demo Video" allowfullscreen></iframe>
-            </div>
-        </section>
-
-        <section>
-            <h2>Key Contributions</h2>
-            <ul class="key-points">
-                <li>A novel Multi-Modal Motion Condition Generator...</li>
-                <li>A two-stage training strategy...</li>
-                <li>A diverse and comprehensive training dataset...</li>
-                <li>Extensive experimental results...</li>
-            </ul>
-        </section>
-
-        <section>
-            <h2>Citation</h2>
-            <div class="citation">@article{zhang2025egvd, title={EGVD: Event-Guided Video Diffusion Model...}</div>
-        </section>
+        <div class="buttons">
+            <a href="https://arxiv.org/abs/2503.20268" class="btn" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Paper
+            </a>
+            <a href="https://github.com/OpenImagingLab/EGVD" class="btn" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                Code
+            </a>
+            <a href="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/view?usp=drive_link" class="btn" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+                Demo Video
+            </a>
+        </div>
     </div>
+</header>
 
-    <footer>
-        <div class="container">
-            <p>© 2025 <a href="https://github.com/OpenImagingLab/EGVD" target="_blank">OpenImagingLab</a>. All rights reserved.</p>
+<div class="container main-content">
+    <div class="image-container">
+        <img src="./docs/teaser.png" alt="EGVD Teaser" class="teaser-image">
+        <div class="image-caption">Visual comparisons of our EGVD method against existing approaches for frame interpolation across diverse scenarios</div>
+    </div>
+    
+    <section id="abstract">
+        <h2>Abstract</h2>
+        <p>Video frame interpolation (VFI) in scenarios with large motion remains challenging due to motion ambiguity between frames. While event cameras can capture high temporal resolution motion information, existing event-based VFI methods struggle with limited training data and complex motion patterns. In this paper, we introduce Event-Guided Video Diffusion Model (EGVD), a novel framework that leverages the powerful priors of pre-trained stable video diffusion models alongside the precise temporal information from event cameras. Our approach features a Multi-modal Motion Condition Generator (MMCG) that effectively integrates RGB frames and event signals to guide the diffusion process, producing physically realistic intermediate frames. We employ a selective fine-tuning strategy that preserves spatial modeling capabilities while efficiently incorporating event-guided temporal information. We incorporate input-output normalization techniques inspired by recent advances in diffusion modeling to enhance training stability across varying noise levels. To improve generalization, we construct a comprehensive dataset combining both real and simulated event data across diverse scenarios. Extensive experiments on both real and simulated datasets demonstrate that EGVD significantly outperforms existing methods in handling large motion and challenging lighting conditions, achieving substantial improvements in perceptual quality metrics (27.4% better LPIPS on Prophesee and 24.1% on BSRGB) while maintaining competitive fidelity measures.</p>
+    </section>
+    
+    <section id="method">
+        <h2>Method</h2>
+        <div class="image-container">
+            <img src="./docs/framework.png" alt="EGVD Framework" class="framework-image">
+            <div class="image-caption">Overview of our Event-Guided Video Diffusion Model (EGVD) framework</div>
         </div>
-    </footer>
+    </section>
+    
+    <section id="results">
+        <h2>Results</h2>
+        <div class="video-container">
+            <iframe src="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/preview" title="EGVD Demo Video" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section id="contributions">
+        <h2>Key Contributions</h2>
+        <ul class="key-points">
+            <li>A novel Multi-Modal Motion Condition Generator (MMCG) that integrates event information into the SVD framework to improve the interpolation of large motions.</li>
+            <li>A two-stage training strategy that first trains the conditioning generator independently, followed by fine-tuning the SVD model to adapt to Event-VFI.</li>
+            <li>A diverse and comprehensive training dataset that combines real-world and synthetic event-RGB data, improving the generalization ability of our model.</li>
+            <li>Extensive experimental results demonstrate that our approach outperforms existing methods, particularly in large-motion and low-light scenarios.</li>
+        </ul>
+    </section>
+
+    <section id="citation">
+        <h2>Citation</h2>
+        <div class="citation">@article{zhang2025egvd,
+title={EGVD: Event-Guided Video Diffusion Model for Physically Realistic Large-Motion Frame Interpolation},
+author={Zhang, Ziran and Li, Xiaohui and Liu, Yihao and Wang, Yujin and Chen, Yueting and Xue, Tianfan and Guo, Shi},
+journal={arXiv preprint arXiv:2503.20268},
+year={2025}
+}</div>
+</section>
+</div>
+
+ini
+Copy
+<footer>
+    <div class="container">
+        <p>© 2025 <a href="https://github.com/OpenImagingLab/EGVD" target="_blank">OpenImagingLab</a>. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    // Create event camera-like particles
+    function createParticles() {
+        const particleContainer = document.getElementById('particles');
+        const numParticles = 80;
+        
+        for (let i = 0; i < numParticles; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random position
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            
+            // Random delay and size
+            const delay = Math.random() * 5;
+            const size = 1 + Math.random() * 3;
+            
+            particle.style.left = `${x}%`;
+            particle.style.top = `${y}%`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.animationDelay = `${delay}s`;
+            
+            // Different colors
+            const colors = ['#5046e5', '#00b4d8', '#ff4d6d', '#ffbe0b', '#5e60ce'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.background = color;
+            
+            particleContainer.appendChild(particle);
+        }
+    }
+
+    // Animate sections on scroll
+    function animateSections() {
+        const sections = document.querySelectorAll('section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+        
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        createParticles();
+        animateSections();
+    });
+</script>
 </body>
+
 </html>

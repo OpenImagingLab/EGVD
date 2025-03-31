@@ -4,30 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EGVD: Event-Guided Video Diffusion Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(45deg, #8e44ad, #3498db);
+            animation: gradient-animation 10s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes gradient-animation {
+            0% {
+                background-image: linear-gradient(45deg, #8e44ad, #3498db);
+            }
+            50% {
+                background-image: linear-gradient(45deg, #3498db, #8e44ad);
+            }
+            100% {
+                background-image: linear-gradient(45deg, #8e44ad, #3498db);
+            }
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            max-width: 900px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            margin: 0 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: slideIn 2s ease-in-out;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            animation: fadeIn 3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #8e44ad;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            border: none;
+        }
+
+        ul {
+            text-align: left;
+            margin-left: 30px;
+        }
+    </style>
 </head>
 <body>
-    <header>
+
+    <div class="container">
         <h1>EGVD: Event-Guided Video Diffusion Model</h1>
-        <p>A Physically Realistic Large-Motion Frame Interpolation Approach</p>
-    </header>
-    <section>
-        <h2>Overview</h2>
-        <p>The Event-Guided Video Diffusion Model (EGVD) is designed to address challenges in large-motion frame interpolation by utilizing both event-based data and diffusion models for high-quality video synthesis.</p>
-    </section>
-    <section>
-        <h2>Features</h2>
-        <ul>
-            <li>Uses event-based camera data for high temporal resolution.</li>
-            <li>Integrates stable video diffusion models for improved frame interpolation.</li>
-            <li>Works well under challenging conditions, such as large motion and low-light scenarios.</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Getting Started</h2>
-        <p>To get started with EGVD, you can clone this repository and follow the instructions in the README for installation and usage.</p>
-    </section>
-    <footer>
-        <p>For more details, visit the <a href="https://github.com/OpenImagingLab/EGVD">EGVD GitHub Repository</a>.</p>
-    </footer>
+        <p>Event-Guided Video Diffusion Model (EGVD) addresses the challenges of frame interpolation in large-motion scenarios by utilizing event camera data with stable video diffusion models, offering physically realistic results with high perceptual quality.</p>
+        
+        <div class="section">
+            <h2>Abstract</h2>
+            <p>Video frame interpolation (VFI) in scenarios with large motion remains challenging due to motion ambiguity between frames. While event cameras can capture high temporal resolution motion information, existing event-based VFI methods struggle with limited training data and complex motion patterns. In this paper, we introduce Event-Guided Video Diffusion Model (EGVD), a novel framework that leverages the powerful priors of pre-trained stable video diffusion models alongside the precise temporal information from event cameras. Our approach features a Multi-modal Motion Condition Generator (MMCG) that effectively integrates RGB frames and event signals to guide the diffusion process, producing physically realistic intermediate frames.</p>
+        </div>
+
+        <div class="section">
+            <h2>Key Advantages</h2>
+            <ul>
+                <li><strong>Event-Driven:</strong> Utilizes high temporal resolution from event cameras for accurate motion interpolation.</li>
+                <li><strong>Diffusion Priors:</strong> Leverages powerful generative priors from pre-trained video diffusion models for improved quality.</li>
+                <li><strong>Selective Fine-Tuning:</strong> Preserves spatial information while incorporating event-driven temporal data efficiently.</li>
+                <li><strong>Improved Generalization:</strong> Trained on a comprehensive dataset combining real-world and simulated data.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>See It In Action</h2>
+            <a href="https://drive.google.com/file/d/14nGFibda426PAEWHNfr5_jcO1NG3QEyr/view?usp=drive_link" target="_blank" class="btn">Watch the Demo Video</a>
+        </div>
+
+        <div class="section">
+            <h2>Visual Comparison</h2>
+            <iframe src="https://www.youtube.com/embed/your_video_id" title="EGVD Demo Video"></iframe>
+        </div>
+    </div>
+
 </body>
 </html>
